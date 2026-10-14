@@ -21,6 +21,7 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'index.html') -Destination $stage
 Copy-Item -LiteralPath (Join-Path $projectRoot 'style.css') -Destination $stageDir
 Copy-Item -LiteralPath (Join-Path $projectRoot 'game.js') -Destination $stageDir
 Copy-Item -LiteralPath (Join-Path $projectRoot 'audio') -Destination $stageDir -Recurse
+Copy-Item -LiteralPath (Join-Path $projectRoot 'assets') -Destination $stageDir -Recurse
 
 if (Test-Path -LiteralPath $archivePath) {
     Remove-Item -LiteralPath $archivePath -Force
@@ -28,3 +29,4 @@ if (Test-Path -LiteralPath $archivePath) {
 
 Compress-Archive -Path (Join-Path $stageDir '*') -DestinationPath $archivePath -CompressionLevel Optimal
 Write-Host "B 站 Toy 上传包已生成：$archivePath"
+
