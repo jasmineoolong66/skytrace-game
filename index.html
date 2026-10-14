@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#07110f">
+  <meta name="description" content="在无限网格天空中转向、闪避，并诱导追踪导弹互相撞毁。">
+  <title>尾迹：临界航线</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="game-shell" aria-label="尾迹：临界航线游戏">
+    <canvas id="game" aria-label="游戏画面"></canvas>
+
+    <header class="hud">
+      <div class="brand"><i></i><span>尾迹</span><small>临界航线</small></div>
+      <div class="stats" aria-live="polite">
+        <div><span>生存</span><strong id="time">00:00</strong></div>
+        <div class="score-stat"><span>积分</span><strong id="score">0</strong></div>
+        <div><span>击毁</span><strong id="kills">0</strong></div>
+        <div><span>威胁</span><strong id="threat">0</strong></div>
+      </div>
+      <button class="icon-btn" id="pauseBtn" aria-label="暂停游戏" title="暂停 / P"><span></span><span></span></button>
+    </header>
+
+    <div class="radar" aria-hidden="true"><canvas id="radar" width="152" height="152"></canvas><span>雷达 · 600m</span></div>
+    <div class="hint" id="hint"><span class="desktop-controls"><kbd>按住拖动</kbd> 或 <kbd>WASD</kbd> 转向 · <kbd>空格</kbd> 冲刺</span><span class="mobile-controls"><kbd>按住拖动</kbd> 转向 · <kbd>双击</kbd> 冲刺</span></div>
+    <div class="danger" id="danger" aria-hidden="true">导弹接近</div>
+
+    <section class="overlay visible" id="startScreen">
+      <div class="panel intro-panel">
+        <div class="eyebrow">尾迹：临界航线 — 无尽空域 · 生存演练</div>
+        <h1>把追击，<em>变成武器。</em></h1>
+        <p>导弹比你快，却没有你灵活。别只顾逃跑——主动切入它们的路线，制造碰撞。</p>
+        <div class="rules" aria-label="玩法说明">
+          <div><b>01</b><span><strong>诱导碰撞</strong>每次碰撞 +100，三连撞及以上额外加分</span></div>
+          <div><b>02</b><span><strong>完美击杀</strong>两枚导弹航向夹角达到 90°，额外 +100</span></div>
+          <div><b>03</b><span><strong>贴身掠过</strong>靠近导弹后成功脱离，获得 +40</span></div>
+          <div><b>04</b><span><strong>黑刺爆弹</strong>坚持 45 秒后进入空域；白色虚线标出爆炸范围</span></div>
+        </div>
+        <div class="control-demo" aria-hidden="true">
+          <div class="gesture"><b></b><i></i></div>
+          <span id="controlText">按住拖动转向；<strong>空格 / 手机双击</strong>消耗 500 分冲刺</span>
+        </div>
+        <button class="primary" id="startBtn">进入空域 <span>→</span></button>
+        <small class="best">最佳生存：<b id="bestStart">00:00</b></small>
+      </div>
+    </section>
+
+    <section class="overlay" id="pauseScreen">
+      <div class="panel compact">
+        <div class="eyebrow">飞行暂停</div>
+        <h2>空域已冻结</h2>
+        <button class="primary" id="resumeBtn">继续飞行 <span>→</span></button>
+        <button class="text-btn" id="restartPauseBtn">重新开始</button>
+      </div>
+    </section>
+
+    <section class="overlay" id="enemyIntro" role="dialog" aria-modal="true" aria-labelledby="enemyTitle">
+      <div class="panel enemy-panel">
+        <div class="enemy-mark" aria-hidden="true"><i></i></div>
+        <div>
+          <div class="eyebrow">空域威胁更新</div>
+          <h2 id="enemyTitle">新敌人进入空域</h2>
+          <h3>黑刺爆弹</h3>
+          <p>首次逼近会将它激活。闪烁倒计时结束后，红色爆炸波会向白色虚线圈扩张；红圈扫到导弹会将其清除，扫到你则会击落飞机。</p>
+          <p class="enemy-tip">它与导弹相撞或被爆炸波扫中后，会停在原地快速闪烁，短暂蓄力后再爆炸。虚线只提示最远范围，不会造成伤害。</p>
+          <button class="primary" id="enemyContinueBtn">明白，继续飞行 <span>→</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="overlay" id="gameOverScreen">
+      <div class="panel result-panel">
+        <div class="eyebrow">飞行记录终止</div>
+        <h2 id="resultTitle">差一点。</h2>
+        <div class="result-stats">
+          <div><span>生存时间</span><strong id="finalTime">00:00.0</strong></div>
+          <div><span>本局积分</span><strong id="finalScore">0</strong></div>
+          <div><span>诱导击毁</span><strong id="finalKills">0</strong></div>
+        </div>
+        <p id="recordLine">再绕紧一点，导弹就会替你解决彼此。</p>
+        <button class="primary" id="restartBtn">再次起飞 <span>↻</span></button>
+      </div>
+    </section>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>
