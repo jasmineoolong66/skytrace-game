@@ -5,7 +5,7 @@
   const radar = document.querySelector('#radar');
   const rctx = radar.getContext('2d');
   const $ = s => document.querySelector(s);
-  const ui = { time:$('#time'), score:$('#score'), kills:$('#kills'), threat:$('#threat'), hint:$('#hint'), danger:$('#danger'), start:$('#startScreen'), pause:$('#pauseScreen'), enemy:$('#enemyIntro'), over:$('#gameOverScreen') };
+  const ui = { time:$('#time'), score:$('#score'), kills:$('#kills'), threat:$('#threat'), hint:$('#hint'), danger:$('#danger'), title:$('#titleScreen'), start:$('#startScreen'), pause:$('#pauseScreen'), enemy:$('#enemyIntro'), over:$('#gameOverScreen') };
 
   let W=0,H=0,dpr=1,last=0,state='menu',elapsed=0,spawnClock=0,nextBurstAt=45,kills=0,score=0,shake=0,flash=0,enemyIntroShown=false,enemyTransition=0,musicFadeFrame=0;
   let pointer={active:false,x:0,y:0}, keys=new Set(), missiles=[], particles=[], trails=[], callouts=[], blasts=[];
@@ -86,7 +86,7 @@
   document.addEventListener('touchstart',unlockAudio,{capture:true,passive:true});
   document.addEventListener('keydown',unlockAudio,{capture:true});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state==='playing')unlockAudio()});
-  document.addEventListener('click',e=>{if(e.target instanceof Element&&e.target.closest('button'))playSound('click')});
+  document.addEventListener('click',e=>{if(e.target instanceof Element&&e.target.closest('button,.author-link'))playSound('click')});
 
   function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}
   addEventListener('resize',resize);resize();
@@ -97,9 +97,10 @@
     pointer.active=false;lastTouchTap=0;dashNoticeAt=0;ui.hint.style.opacity='1';show(ui.enemy,false);updateHUD();
   }
   function show(el,on){el.classList.toggle('visible',on)}
-  function begin(){reset();state='playing';show(ui.start,false);show(ui.pause,false);show(ui.over,false);last=performance.now();startBackgroundMusic()}
-  function pause(){if(state!=='playing')return;state='paused';show(ui.pause,true)}
-  function resume(){if(state!=='paused')return;state='playing';show(ui.pause,false);last=performance.now()}
+  function showIntro(){if(state!=='menu')return;state='intro';show(ui.title,false);show(ui.start,true)}
+  function begin(){reset();state='playing';show(ui.title,false);show(ui.start,false);show(ui.pause,false);show(ui.over,false);last=performance.now();startBackgroundMusic()}
+  function pause(){if(state!=='playing')return;state='paused';pointer.active=false;backgroundMusic.pause();show(ui.pause,true)}
+  function resume(){if(state!=='paused')return;state='playing';show(ui.pause,false);last=performance.now();backgroundMusic.volume=MUSIC_VOLUME;backgroundMusic.play().catch(()=>{})}
   function startEnemyTransition(){
     if(enemyIntroShown)return;
     enemyIntroShown=true;state='enemyTransition';pointer.active=false;enemyTransition=ENEMY_CLEAR_DELAY;
@@ -114,7 +115,7 @@
     if(state!=='enemyIntro')return;
     state='playing';spawnClock=999;show(ui.enemy,false);last=performance.now();
   }
-  $('#startBtn').onclick=begin;$('#restartBtn').onclick=begin;$('#restartPauseBtn').onclick=begin;$('#resumeBtn').onclick=resume;$('#pauseBtn').onclick=()=>state==='paused'?resume():pause();
+  $('#titleStartBtn').onclick=showIntro;$('#startBtn').onclick=begin;$('#restartBtn').onclick=begin;$('#restartPauseBtn').onclick=begin;$('#resumeBtn').onclick=resume;$('#pauseBtn').onclick=()=>state==='paused'?resume():pause();
   $('#enemyContinueBtn').onclick=continueFromEnemyIntro;
   addEventListener('keydown',e=>{
     keys.add(e.key.toLowerCase());
@@ -280,3 +281,4 @@
   function frame(t){const dt=Math.min((t-last)/1000,.034)||0;last=t;if(state==='playing')update(dt);if(state==='enemyTransition'){enemyTransition-=dt;if(enemyTransition<=0)showEnemyIntro()}if(state==='playing'||state==='over'||state==='enemyTransition'||state==='enemyIntro')updateEffects(dt);draw();requestAnimationFrame(frame)}
   reset();requestAnimationFrame(frame);
 })();
+
